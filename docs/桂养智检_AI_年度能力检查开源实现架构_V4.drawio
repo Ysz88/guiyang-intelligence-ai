@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-08-07T23:59:00.000Z" agent="Codex" version="24.7.17" type="device" compressed="false">
+  <diagram id="annual-check-v4" name="AI年度能力检查开源实现架构 V4">
+    <mxGraphModel dx="1600" dy="1900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="&lt;b&gt;桂养智检 AI：养老院老人年度能力检查与分级辅助系统（开源实现）&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=27;fontColor=#173A2C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="20" width="1460" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="四种输入可切换｜AI 只结构化｜人员全量确认｜确定性规则分级｜个人·机构·脱敏监管输出" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;fontColor=#4A5A52;" vertex="1" parent="1">
+          <mxGeometry x="70" y="70" width="1460" height="35" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="check-layer" value="1. 年度检查五维任务" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;arcSize=6;strokeWidth=2;strokeColor=#5077A1;fillColor=#DCE9F5;fontColor=#244768;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="125" width="1460" height="210" as="geometry"/>
+        </mxCell>
+        <mxCell id="mobility" value="&lt;b&gt;手脚灵活&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;坐站｜行走｜转身&lt;br/&gt;抬臂｜手指对合/抓放&lt;br/&gt;完成情况 + 用时 + 关键点&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#4E8C68;fillColor=#FFFFFF;fontColor=#28553B;fontSize=16;" vertex="1" parent="check-layer">
+          <mxGeometry x="25" y="55" width="260" height="115" as="geometry"/>
+        </mxCell>
+        <mxCell id="speech" value="&lt;b&gt;口齿与沟通&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;固定短句 + 结构化问答&lt;br/&gt;ASR 原文 → 人工修正 → 确认&lt;br/&gt;语言背景不参与能力评分&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5077A1;fillColor=#FFFFFF;fontColor=#244768;fontSize=16;" vertex="1" parent="check-layer">
+          <mxGeometry x="310" y="55" width="260" height="115" as="geometry"/>
+        </mxCell>
+        <mxCell id="sensory" value="&lt;b&gt;视听能力&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;简短任务 + 标准问项&lt;br/&gt;校准设备时自动采集&lt;br/&gt;否则由护理人员录入&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#7664A5;fillColor=#FFFFFF;fontColor=#493B73;fontSize=16;" vertex="1" parent="check-layer">
+          <mxGeometry x="595" y="55" width="260" height="115" as="geometry"/>
+        </mxCell>
+        <mxCell id="psych" value="&lt;b&gt;心理与认知&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;简短授权问卷&lt;br/&gt;确定性逐题计分&lt;br/&gt;危机线索直接转人工&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#C27B27;fillColor=#FFFFFF;fontColor=#754611;fontSize=16;" vertex="1" parent="check-layer">
+          <mxGeometry x="880" y="55" width="260" height="115" as="geometry"/>
+        </mxCell>
+        <mxCell id="adl" value="&lt;b&gt;日常生活能力&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;进食｜穿衣｜如厕&lt;br/&gt;移动｜用药｜照护协助&lt;br/&gt;老人 + 护理人员确认&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#6B6F73;fillColor=#FFFFFF;fontColor=#34383B;fontSize=16;" vertex="1" parent="check-layer">
+          <mxGeometry x="1165" y="55" width="260" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="input-note" value="&lt;b&gt;输入前：知情同意 + 摄像头/麦克风/网络自检，可随时切换输入&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;① AI 视频语音对话（TTS + 大字幕 + 允许打断）　② 触屏自填　③ 护理人员代录　④ 历史结果导入&lt;br/&gt;语音附加信息（自愿）：普通话 / 地方口音普通话 / 方言或民族语言 / 未知；仅用于 ASR 质控，不用于评分&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;strokeColor=#6B6F73;fillColor=#F3F5F3;fontColor=#344238;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="170" y="355" width="1260" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tool-layer" value="2. 浏览器交互与可替换 AI 适配层（无需先训练专用模型）" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;arcSize=6;strokeWidth=2;strokeColor=#7664A5;fillColor=#EEEAF7;fontColor=#493B73;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="470" width="1460" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="pose" value="&lt;b&gt;实时视频与动作适配器&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;当前站点：getUserMedia 实时预览&lt;br/&gt;生产可接 MediaPipe Pose / Hands&lt;br/&gt;失败或拒绝时改用人工观察&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#4E8C68;fillColor=#FFFFFF;fontColor=#28553B;fontSize=15;" vertex="1" parent="tool-layer">
+          <mxGeometry x="55" y="55" width="300" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="asr" value="&lt;b&gt;语音播报与识别适配器&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;当前站点：Web Speech API + TTS&lt;br/&gt;生产可接 FunASR / faster-whisper&lt;br/&gt;原文保留、人工改字、置信度只质控&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5077A1;fillColor=#FFFFFF;fontColor=#244768;fontSize=15;" vertex="1" parent="tool-layer">
+          <mxGeometry x="400" y="55" width="300" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="llm" value="&lt;b&gt;结构化 AI 视频检查员&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;固定问题 + 大字幕 + 允许打断&lt;br/&gt;白名单追问 → 结构化字段草稿&lt;br/&gt;不能调用规则引擎，不能修改评分&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#7664A5;fillColor=#FFFFFF;fontColor=#493B73;fontSize=15;" vertex="1" parent="tool-layer">
+          <mxGeometry x="745" y="55" width="300" height="105" as="geometry"/>
+        </mxCell>
+        <mxCell id="manual" value="&lt;b&gt;人工输入与质量兜底&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;拒绝音视频 / 噪声 / 遮挡提示&lt;br/&gt;护理人员确认或代录结果&lt;br/&gt;任何 AI 模块失败都不阻断检查&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#C08A20;fillColor=#FFF5D9;fontColor=#704D09;fontSize=15;" vertex="1" parent="tool-layer">
+          <mxGeometry x="1090" y="55" width="300" height="105" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="quality" value="&lt;b&gt;知情同意 + 数据质量 + 人工确认门&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;检查授权、缺项、噪声、遮挡、设备与置信度&lt;br/&gt;原文 → 人工修正 → 复述确认；未获同意或未确认不评分&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=3;strokeColor=#C08A20;fillColor=#FFF5D9;fontColor=#704D09;fontSize=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="725" width="390" height="115" as="geometry"/>
+        </mxCell>
+        <mxCell id="record" value="&lt;b&gt;结构化年度检查记录&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;五维逐项记录｜确认文本｜缺项｜质量提醒&lt;br/&gt;语言背景仅质控｜检查员｜规则版本｜历史结果&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;strokeWidth=2;strokeColor=#6B6F73;fillColor=#F4F5F5;fontColor=#34383B;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="605" y="725" width="390" height="115" as="geometry"/>
+        </mxCell>
+        <mxCell id="rules" value="&lt;b&gt;确定性分级规则引擎（非 LLM）&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;五维 0/1/2/3 档｜总体取最高关注档&lt;br/&gt;缺项拒判｜危机停算｜冲突复核｜版本可回放&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=3;strokeColor=#9D4B45;fillColor=#F8DDD9;fontColor=#6B2824;fontSize=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="725" width="390" height="115" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="decision" value="数据完整且没有危机/冲突？" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#C08A20;fillColor=#FFF5D9;fontColor=#704D09;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="650" y="895" width="300" height="115" as="geometry"/>
+        </mxCell>
+        <mxCell id="recheck" value="&lt;b&gt;补测或人工复核&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;重做任务｜改用手工录入&lt;br/&gt;危机线索交护理/专业人员&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#C08A20;fillColor=#FFF5D9;fontColor=#704D09;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="110" y="905" width="360" height="95" as="geometry"/>
+        </mxCell>
+        <mxCell id="confirm" value="&lt;b&gt;检查/复核人员确认&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;确认规则建议或人工处置结论&lt;br/&gt;记录人员、时间与说明，形成审计留痕&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#4E8C68;fillColor=#E2F0E5;fontColor=#28553B;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="905" width="360" height="95" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="output-layer" value="3. 可直接使用的结果" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;arcSize=6;strokeWidth=2;strokeColor=#4E8C68;fillColor=#DCEEDF;fontColor=#28553B;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1050" width="1460" height="190" as="geometry"/>
+        </mxCell>
+        <mxCell id="out-person" value="&lt;b&gt;个人年度结果&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;五维结果｜总体关注等级&lt;br/&gt;历史对比与照护提示&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#4E8C68;fillColor=#FFFFFF;fontColor=#28553B;fontSize=15;" vertex="1" parent="output-layer">
+          <mxGeometry x="30" y="55" width="255" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="out-trend" value="&lt;b&gt;年度变化对比&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;与上次结果比较&lt;br/&gt;标记改善/稳定/下降&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5077A1;fillColor=#FFFFFF;fontColor=#244768;fontSize=15;" vertex="1" parent="output-layer">
+          <mxGeometry x="305" y="55" width="255" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="out-list" value="&lt;b&gt;待复核名单&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;红/橙关注｜缺项｜冲突&lt;br/&gt;一键回到原检查记录&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#C27B27;fillColor=#FFFFFF;fontColor=#754611;fontSize=15;" vertex="1" parent="output-layer">
+          <mxGeometry x="580" y="55" width="255" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="out-org" value="&lt;b&gt;养老院汇总看板&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;完成率｜等级分布｜复核队列&lt;br/&gt;主要能力缺口与服务需求&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#7664A5;fillColor=#FFFFFF;fontColor=#493B73;fontSize=15;" vertex="1" parent="output-layer">
+          <mxGeometry x="855" y="55" width="255" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="out-regulatory" value="&lt;b&gt;脱敏监管摘要&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;机构计数｜完成率｜关注分布&lt;br/&gt;不上行姓名、语言背景与任务明细&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5077A1;fillColor=#FFFFFF;fontColor=#244768;fontSize=15;" vertex="1" parent="output-layer">
+          <mxGeometry x="1130" y="55" width="255" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="data-layer" value="4. 数据与样本策略" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;arcSize=6;strokeWidth=2;strokeColor=#6B6F73;fillColor=#ECEFF1;fontColor=#34383B;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1280" width="1460" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="data-demo" value="&lt;b&gt;比赛演示库&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;60 条确定性模拟档案&lt;br/&gt;覆盖正常/缺项/冲突/危机/低置信度&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#6B6F73;fillColor=#FFFFFF;fontColor=#34383B;fontSize=14;" vertex="1" parent="data-layer">
+          <mxGeometry x="40" y="50" width="300" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="data-pilot" value="&lt;b&gt;小规模授权试用&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;10-30人验证流程、耗时&lt;br/&gt;ASR修正率，不训练诊断模型&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#4E8C68;fillColor=#FFFFFF;fontColor=#28553B;fontSize=14;" vertex="1" parent="data-layer">
+          <mxGeometry x="390" y="50" width="300" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="data-accent" value="&lt;b&gt;本地语言适配记录&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;ASR 原文 + 人工修正文&lt;br/&gt;自愿语言背景；只统计修正率，不入分&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5077A1;fillColor=#FFFFFF;fontColor=#244768;fontSize=14;" vertex="1" parent="data-layer">
+          <mxGeometry x="740" y="50" width="300" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="data-db" value="&lt;b&gt;数据存储&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;演示：浏览器 localStorage&lt;br/&gt;生产：SQLite/PostgreSQL + 加密 + 审计日志&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;strokeWidth=2;strokeColor=#7664A5;fillColor=#FFFFFF;fontColor=#493B73;fontSize=14;" vertex="1" parent="data-layer">
+          <mxGeometry x="1090" y="50" width="300" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="implementation-layer" value="5. 已交付开源站点与生产替换边界" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;arcSize=6;strokeWidth=2;strokeColor=#4E8C68;fillColor=#E6F2ED;fontColor=#28553B;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1455" width="1460" height="165" as="geometry"/>
+        </mxCell>
+        <mxCell id="impl-front" value="&lt;b&gt;前端工作台&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;React + TypeScript + Vite&lt;br/&gt;总览、档案、检查、复核、机构、监管六视图&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#4E8C68;fillColor=#FFFFFF;fontColor=#28553B;fontSize=14;" vertex="1" parent="implementation-layer">
+          <mxGeometry x="40" y="50" width="300" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="impl-demo" value="&lt;b&gt;可离线演示能力&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;浏览器本地状态｜60 条模拟数据&lt;br/&gt;摄像头预览｜TTS｜可用时启用浏览器 ASR&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5077A1;fillColor=#FFFFFF;fontColor=#244768;fontSize=14;" vertex="1" parent="implementation-layer">
+          <mxGeometry x="390" y="50" width="300" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="impl-rules" value="&lt;b&gt;可测试规则核心&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;纯 TypeScript 确定性函数&lt;br/&gt;6 条自动测试｜规则版本随记录保存&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#9D4B45;fillColor=#FFFFFF;fontColor=#6B2824;fontSize=14;" vertex="1" parent="implementation-layer">
+          <mxGeometry x="740" y="50" width="300" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="impl-prod" value="&lt;b&gt;生产替换项&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;账号权限｜服务端数据库｜国密/加密｜备份审计&lt;br/&gt;机构 ASR/姿态服务｜审批后的监管接口&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#C27B27;fillColor=#FFF8E9;fontColor=#754611;fontSize=14;" vertex="1" parent="implementation-layer">
+          <mxGeometry x="1090" y="50" width="300" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="evidence-layer" value="6. 已有成果参照（用于产品设计，不等于临床验证）" style="swimlane;html=1;startSize=34;horizontal=1;rounded=1;arcSize=6;strokeWidth=2;strokeColor=#5077A1;fillColor=#EAF1F7;fontColor=#244768;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1650" width="1460" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="ref-gb" value="&lt;b&gt;GB/T 42195-2022&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;自理、基础运动、精神状态&lt;br/&gt;感知觉与社会参与&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#5077A1;fillColor=#FFFFFF;fontColor=#244768;fontSize=14;" vertex="1" parent="evidence-layer">
+          <mxGeometry x="40" y="50" width="300" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="ref-icope" value="&lt;b&gt;WHO ICOPE&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;运动、感官、认知与心理&lt;br/&gt;强调以老人需求为中心&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#4E8C68;fillColor=#FFFFFF;fontColor=#28553B;fontSize=14;" vertex="1" parent="evidence-layer">
+          <mxGeometry x="390" y="50" width="300" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="ref-vision" value="&lt;b&gt;MediaPipe + 动作量化研究&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;图像/视频人体关键点&lt;br/&gt;坐站与骨架动作评估已有先例&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#7664A5;fillColor=#FFFFFF;fontColor=#493B73;fontSize=14;" vertex="1" parent="evidence-layer">
+          <mxGeometry x="740" y="50" width="300" height="75" as="geometry"/>
+        </mxCell>
+        <mxCell id="ref-asr" value="&lt;b&gt;FunASR + ASR 研究&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px&quot;&gt;流式/离线/边缘部署可实现&lt;br/&gt;异常语音识别需人工确认&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;strokeWidth=2;strokeColor=#C27B27;fillColor=#FFFFFF;fontColor=#754611;fontSize=14;" vertex="1" parent="evidence-layer">
+          <mxGeometry x="1090" y="50" width="300" height="75" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="boundary" value="最小合规边界：辅助检查非医疗诊断｜未获同意不得评分｜可跳过音视频｜大模型不改等级｜原始音视频默认不保存｜危机/冲突/缺项转人工｜监管只输出脱敏聚合摘要" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;strokeWidth=2;strokeColor=#9D4B45;fillColor=#FDF1EF;fontColor=#6B2824;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="1815" width="1360" height="58" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e-check-input" edge="1" parent="1" source="check-layer" target="input-note" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#5077A1;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-input-tools" edge="1" parent="1" source="input-note" target="tool-layer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#7664A5;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-tools-quality" value="AI结果 + 质量信息" edge="1" parent="1" source="tool-layer" target="quality" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C08A20;endArrow=block;endFill=1;fontSize=11;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-quality-record" value="确认后的数据" edge="1" parent="1" source="quality" target="record" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6B6F73;endArrow=block;endFill=1;fontSize=11;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-record-rules" value="结构化字段" edge="1" parent="1" source="record" target="rules" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9D4B45;endArrow=block;endFill=1;fontSize=11;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-rules-decision" value="分级与红线" edge="1" parent="1" source="rules" target="decision" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#9D4B45;endArrow=block;endFill=1;fontSize=11;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-decision-recheck" value="否" edge="1" parent="1" source="decision" target="recheck" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#C08A20;endArrow=block;endFill=1;fontSize=12;fontStyle=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-recheck-quality" value="补测/修正" edge="1" parent="1" source="recheck" target="quality" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeWidth=2;strokeColor=#C08A20;endArrow=block;endFill=1;fontSize=11;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-decision-confirm" value="是" edge="1" parent="1" source="decision" target="confirm" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4E8C68;endArrow=block;endFill=1;fontSize=12;fontStyle=1;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-confirm-output" value="确认结果" edge="1" parent="1" source="confirm" target="output-layer" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#4E8C68;endArrow=block;endFill=1;fontSize=11;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-output-data" value="持久化/年度对比" edge="1" parent="1" source="output-layer" target="data-layer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#6B6F73;endArrow=block;endFill=1;fontSize=11;">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e-data-record" value="历史基线" edge="1" parent="1" source="data-layer" target="record" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeWidth=2;strokeColor=#6B6F73;endArrow=block;endFill=1;fontSize=11;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1560" y="1350"/>
+              <mxPoint x="1560" y="763"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
