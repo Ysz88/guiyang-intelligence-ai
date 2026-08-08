@@ -7,6 +7,9 @@ import {
 function frame(overrides: Partial<PoseFrame> = {}): PoseFrame {
   return {
     visibility: 0.96,
+    frameQuality: 0.96,
+    inFrameRatio: 1,
+    centerOffset: 0.02,
     bodyScale: 0.25,
     shoulderX: 0.5,
     hipX: 0.5,
@@ -19,6 +22,8 @@ function frame(overrides: Partial<PoseFrame> = {}): PoseFrame {
     rightWristAbove: false,
     fingerGap: 0.12,
     ankleMotionPoint: 0.5,
+    leftAnkleX: 0.44,
+    rightAnkleX: 0.56,
     ...overrides,
   }
 }
@@ -56,5 +61,40 @@ describe('pose observation scoring', () => {
 
     expect(result.score).toBeNull()
     expect(result.summary).toContain('人工观察')
+  })
+
+  it('ignores a single landmark outlier in a stable sitting sequence', () => {
+    const frames = Array.from({ length: 30 }, (_, index) => frame({
+      torsoTilt: index === 15 ? 1.4 : 0.05,
+      shoulderX: index === 15 ? 0.82 : 0.5,
+    }))
+
+    const result = scorePoseFramesForTest(0, frames)
+
+    expect(result.score).toBe(0)
+  })
+
+  it('does not treat a brief arm landmark jump as completed bilateral raising', () => {
+    const frames = Array.from({ length: 30 }, (_, index) => frame({
+      leftWristAbove: index >= 12 && index <= 14,
+      rightWristAbove: index >= 12 && index <= 14,
+      wristY: index >= 12 && index <= 14 ? 0.3 : 0.54,
+    }))
+
+    const result = scorePoseFramesForTest(3, frames)
+
+    expect(result.score).not.toBe(0)
+  })
+
+  it('refuses automatic scoring when required landmarks leave the frame', () => {
+    const frames = Array.from({ length: 24 }, () => frame({
+      inFrameRatio: 0.75,
+      frameQuality: 0.82,
+    }))
+
+    const result = scorePoseFramesForTest(2, frames)
+
+    expect(result.score).toBeNull()
+    expect(result.summary).toContain('离开画面')
   })
 })
