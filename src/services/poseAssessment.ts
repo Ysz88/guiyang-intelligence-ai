@@ -97,7 +97,6 @@ function resolveAsset(relativePath: string) {
 async function createLandmarker(delegate: 'CPU' | 'GPU') {
   const fileset = await FilesetResolver.forVisionTasks(
     resolveAsset('mediapipe-wasm/'),
-    true,
   )
   return PoseLandmarker.createFromOptions(fileset, {
     baseOptions: {
