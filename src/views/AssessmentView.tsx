@@ -44,6 +44,7 @@ import {
   loadPoseLandmarker,
   observeMobilityTask,
   POSE_CONNECTIONS,
+  type PoseFrameGuidance,
 } from '../services/poseAssessment'
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision'
 import type {
@@ -121,6 +122,7 @@ export function AssessmentView({
   const [cameraMessage, setCameraMessage] = useState('摄像头未开启')
   const [poseStatus, setPoseStatus] = useState<PoseAnalysisStatus>('idle')
   const [poseProgress, setPoseProgress] = useState(0)
+  const [poseGuidance, setPoseGuidance] = useState<PoseFrameGuidance | null>(null)
   const [visionPhase, setVisionPhase] = useState<VisionCardPhase>('ready')
   const [visionCardIndex, setVisionCardIndex] = useState(0)
   const [visionRecognizedCount, setVisionRecognizedCount] = useState<number | null>(null)
@@ -149,6 +151,7 @@ export function AssessmentView({
     setCameraMessage('摄像头未开启')
     setPoseStatus('idle')
     setPoseProgress(0)
+    setPoseGuidance(null)
     setVisionPhase('ready')
     setVisionRecognizedCount(null)
   // cameraStream is intentionally excluded: changing residents is the reset boundary.
@@ -178,6 +181,7 @@ export function AssessmentView({
     poseAbortRef.current?.abort()
     setPoseStatus('idle')
     setPoseProgress(0)
+    setPoseGuidance(null)
     visionRunRef.current += 1
     setVisionPhase('ready')
     setVisionCardIndex(0)
@@ -294,6 +298,7 @@ export function AssessmentView({
     setCameraStream(null)
     setPoseStatus('idle')
     setPoseProgress(0)
+    setPoseGuidance(null)
     clearPoseOverlay()
     setCameraMessage('摄像头已关闭，未保存任何原始视频')
   }
@@ -303,6 +308,7 @@ export function AssessmentView({
     if (!videoRef.current) return null
     const stream = await startCamera(videoRef.current)
     setCameraStream(stream)
+    setPoseGuidance(null)
     setCameraMessage('实时画面已开启，可开始AI观察')
     return stream
   }
@@ -324,6 +330,7 @@ export function AssessmentView({
       poseAbortRef.current?.abort()
       setPoseStatus('idle')
       setPoseProgress(0)
+      setPoseGuidance(null)
       setCameraMessage('AI观察已停止，可改用人工记录')
       return
     }
@@ -336,7 +343,8 @@ export function AssessmentView({
       poseAbortRef.current = controller
       setPoseStatus('loading')
       setPoseProgress(0)
-      setCameraMessage('正在本机加载姿态模型…')
+      setPoseGuidance(null)
+      setCameraMessage('正在本机加载高精度姿态模型…')
       await loadPoseLandmarker()
       if (controller.signal.aborted) return
       setPoseStatus('analyzing')
@@ -344,9 +352,10 @@ export function AssessmentView({
 
       const result = await observeMobilityTask(videoRef.current, activeTaskIndex, {
         signal: controller.signal,
-        onFrame: (landmarks, progress) => {
+        onFrame: (landmarks, progress, guidance) => {
           drawPoseOverlay(landmarks)
           setPoseProgress(progress)
+          setPoseGuidance(guidance)
         },
       })
       const evidence: AiTaskEvidence = {
@@ -376,7 +385,7 @@ export function AssessmentView({
         aiEvidence: upsertEvidence(current.aiEvidence, evidence),
       }))
       setCameraMessage(result.score === null
-        ? '姿态质量不足，未自动选档，请调整画面或人工记录'
+        ? result.summary
         : `AI已预选${result.score}档，等待检查人员确认`)
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return
@@ -672,6 +681,12 @@ export function AssessmentView({
                 <div className="video-stage">
                   <video ref={videoRef} muted playsInline />
                   <canvas ref={poseCanvasRef} className="pose-overlay" aria-hidden="true" />
+                  {cameraStream ? (
+                    <div
+                      className={`pose-framing-guide ${activeTaskIndex === 1 || activeTaskIndex === 2 ? 'full-body' : 'upper-body'} ${poseGuidance?.level ?? ''}`}
+                      aria-hidden="true"
+                    />
+                  ) : null}
                   {!cameraStream ? (
                     <div className="video-placeholder">
                       <CameraOff size={30} aria-hidden="true" />
@@ -683,6 +698,11 @@ export function AssessmentView({
                     <div className="pose-progress" role="status">
                       <span>{poseStatus === 'loading' ? '加载姿态模型' : '分析当前动作'}</span>
                       <strong>{poseStatus === 'loading' ? '…' : `${Math.round(poseProgress * 100)}%`}</strong>
+                      <small className={poseGuidance?.level ?? ''}>
+                        {poseStatus === 'loading'
+                          ? '首次加载可能需要数秒'
+                          : poseGuidance?.message ?? '请保持在取景框内'}
+                      </small>
                       <div><i style={{ width: `${Math.max(4, poseProgress * 100)}%` }} /></div>
                     </div>
                   ) : null}
