@@ -179,6 +179,17 @@ export function ReviewView({
                     <div><dt>姿态质量</dt><dd>{selected.draft.poseQuality ?? '人工观察/未采集'}</dd></div>
                     <div><dt>字段全量确认</dt><dd>{selected.draft.fieldCheckDone ? '是' : '否'}</dd></div>
                     <div><dt>原始音视频</dt><dd>未保存</dd></div>
+                    {(selected.draft.aiEvidence ?? []).map((evidence) => (
+                      <div key={evidence.taskId}>
+                        <dt>{evidence.taskId} · {evidence.source}</dt>
+                        <dd>
+                          {evidence.suggestedScore === null ? '未自动选档' : `建议${evidence.suggestedScore}档`}
+                          {' · '}置信度{Math.round(evidence.confidence * 100)}%
+                          {' · '}{evidence.reviewStatus}
+                          <br />{evidence.summary}
+                        </dd>
+                      </div>
+                    ))}
                   </dl>
                 </section>
               </div>

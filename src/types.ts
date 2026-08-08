@@ -43,6 +43,18 @@ export interface ConsentState {
   allowVideo: boolean
 }
 
+export interface AiTaskEvidence {
+  taskId: string
+  source: 'MediaPipe姿态' | '大字图卡'
+  suggestedScore: TaskScore
+  confidence: number
+  quality: number | null
+  summary: string
+  metrics: string[]
+  reviewStatus: '待确认' | '已确认' | '已修改' | '转人工'
+  capturedAt: string
+}
+
 export interface AssessmentDraft {
   residentId: string
   inputMode: InputMode
@@ -50,6 +62,7 @@ export interface AssessmentDraft {
   tasks: Record<DimensionKey, TaskScore[]>
   speechEvidence: SpeechEvidence
   poseQuality: number | null
+  aiEvidence?: AiTaskEvidence[]
   fieldCheckDone: boolean
   crisisFlag: boolean
   crisisNote: string

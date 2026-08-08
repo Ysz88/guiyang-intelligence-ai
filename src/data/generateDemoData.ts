@@ -88,6 +88,7 @@ export function createBlankDraft(
       languageNote: '',
     },
     poseQuality: null,
+    aiEvidence: [],
     fieldCheckDone: false,
     crisisFlag: false,
     crisisNote: '',

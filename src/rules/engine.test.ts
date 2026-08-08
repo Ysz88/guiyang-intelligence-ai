@@ -27,6 +27,7 @@ const baseDraft = (): AssessmentDraft => ({
     languageNote: '',
   },
   poseQuality: 0.91,
+  aiEvidence: [],
   fieldCheckDone: true,
   crisisFlag: false,
   crisisNote: '',
