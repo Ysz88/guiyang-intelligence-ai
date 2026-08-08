@@ -1089,6 +1089,33 @@ h3 {
   transform: scaleX(-1);
 }
 
+.pose-framing-guide {
+  position: absolute;
+  pointer-events: none;
+  border: 2px dashed rgba(255, 255, 255, 0.56);
+  border-radius: 6px;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.pose-framing-guide.full-body {
+  inset: 5% 24% 13%;
+}
+
+.pose-framing-guide.upper-body {
+  inset: 12% 9% 18%;
+}
+
+.pose-framing-guide.ready {
+  border-color: #55e0b6;
+  background: rgba(85, 224, 182, 0.035);
+}
+
+.pose-framing-guide.adjust,
+.pose-framing-guide.missing {
+  border-color: #f0c66a;
+  background: rgba(240, 198, 106, 0.045);
+}
+
 .video-placeholder {
   position: absolute;
   inset: 0;
@@ -1131,6 +1158,22 @@ h3 {
   background: rgba(11, 43, 35, 0.88);
   border: 1px solid rgba(99, 218, 181, 0.48);
   border-radius: 5px;
+}
+
+.pose-progress small {
+  grid-column: 1 / -1;
+  color: #d8e6e1;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.pose-progress small.ready {
+  color: #86edce;
+}
+
+.pose-progress small.adjust,
+.pose-progress small.missing {
+  color: #f4d892;
 }
 
 .pose-progress > div {
