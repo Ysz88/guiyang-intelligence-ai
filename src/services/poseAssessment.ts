@@ -62,6 +62,8 @@ export interface PoseFrame {
   shoulderX: number
   hipX: number
   hipY: number
+  leftKneeY: number
+  rightKneeY: number
   shoulderWidth: number
   torsoTilt: number
   wristX: number
@@ -255,6 +257,8 @@ function frameFromLandmarks(
     shoulderX: shoulder.x,
     hipX: hip.x,
     hipY: hip.y,
+    leftKneeY: landmarks[LANDMARK.leftKnee].y,
+    rightKneeY: landmarks[LANDMARK.rightKnee].y,
     shoulderWidth,
     torsoTilt: Math.abs(shoulder.x - hip.x) / bodyScale,
     wristX: wrist.x,
@@ -345,17 +349,25 @@ function buildResult(
 
   const scale = median(frames.map((frame) => frame.bodyScale))
   const hipVerticalRange = robustRange(frames.map((frame) => frame.hipY)) / scale
-  const hipHorizontalRange = robustRange(frames.map((frame) => frame.hipX)) / scale
   const shoulderSway = robustDeviation(
     frames.map((frame) => frame.shoulderX - frame.hipX),
   ) / scale
   const torsoTilt = median(frames.map((frame) => frame.torsoTilt))
-  const shoulderWidths = frames.map((frame) => frame.shoulderWidth)
-  const shoulderWidthChange = robustRange(shoulderWidths) / Math.max(0.04, quantile(shoulderWidths, 0.9))
   const ankleMotion = average([
     robustRange(frames.map((frame) => frame.leftAnkleX)),
     robustRange(frames.map((frame) => frame.rightAnkleX)),
   ]) / scale
+  const kneeMotion = average([
+    robustRange(frames.map((frame) => frame.leftKneeY)),
+    robustRange(frames.map((frame) => frame.rightKneeY)),
+  ]) / scale
+  const kneeSymmetry = Math.min(
+    robustRange(frames.map((frame) => frame.leftKneeY)),
+    robustRange(frames.map((frame) => frame.rightKneeY)),
+  ) / Math.max(0.01, Math.max(
+    robustRange(frames.map((frame) => frame.leftKneeY)),
+    robustRange(frames.map((frame) => frame.rightKneeY)),
+  ))
   const wristMotion = Math.hypot(
     robustRange(frames.map((frame) => frame.wristX)),
     robustRange(frames.map((frame) => frame.wristY)),
@@ -389,21 +401,22 @@ function buildResult(
     else if (transferMotion > 0.17) score = 2
     else score = 3
     summary = score <= 1
-      ? '检测到较完整的起身与转移动作。'
-      : '髋部位移不足，可能未完成转移或画面范围不完整。'
-    metrics = [`髋部垂直位移 ${metric(hipVerticalRange)}`, `下肢位移 ${metric(ankleMotion)}`]
+      ? '检测到从椅上站起并缓慢坐回的动作。'
+      : '起身或坐回的髋部位移证据不足，请由现场人员确认是否需要扶手或协助。'
+    metrics = [`髋部垂直位移 ${metric(hipVerticalRange)}`, `脚踝位移 ${metric(ankleMotion)}`]
   } else if (taskIndex === 2) {
-    const walkingMotion = hipHorizontalRange + ankleMotion * 0.45
-    if (walkingMotion > 1.0 && shoulderWidthChange > 0.16 && shoulderSway < 0.34) score = 0
-    else if (walkingMotion > 0.68 && shoulderWidthChange > 0.1) score = 1
-    else if (walkingMotion > 0.28) score = 2
+    // ZT-03 is deliberately performed seated. Knee movement is the evidence;
+    // horizontal body travel is not required and is treated as a safety concern.
+    if (kneeMotion > 0.52 && kneeSymmetry > 0.32 && shoulderSway < 0.34) score = 0
+    else if (kneeMotion > 0.34 && kneeSymmetry > 0.18) score = 1
+    else if (kneeMotion > 0.16) score = 2
     else score = 3
     summary = score === 0
-      ? '检测到行走位移、转身变化且躯干总体稳定。'
-      : '动作位移或转身证据不足；辅具与搀扶情况仍需现场确认。'
+      ? '检测到坐姿下左右膝交替抬起，躯干总体稳定。'
+      : '坐姿抬膝幅度或左右交替证据不足，请保持臀部接触椅面并由人员确认。'
     metrics = [
-      `行走位移 ${metric(walkingMotion)}`,
-      `转身变化 ${metric(shoulderWidthChange)}`,
+      `左右膝活动幅度 ${metric(kneeMotion)}`,
+      `双侧对称度 ${percent(kneeSymmetry)}`,
       `肩部晃动 ${metric(shoulderSway)}`,
     ]
   } else if (taskIndex === 3) {
