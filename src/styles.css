@@ -1137,6 +1137,28 @@ h3 {
   font-size: 11px;
 }
 
+.pose-safety-note {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 12px;
+  left: 12px;
+  display: grid;
+  gap: 3px;
+  max-width: 340px;
+  padding: 8px 10px;
+  color: #eafff8;
+  background: rgba(11, 43, 35, 0.84);
+  border: 1px solid rgba(99, 218, 181, 0.42);
+  border-radius: 5px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.pose-safety-note strong { color: #86edce; font-size: 12px; }
+.pose-safety-note span { color: #e2f0eb; }
+.pose-safety-note small { color: #f4d892; font-size: 10px; }
+
 .video-status {
   position: absolute;
   inset: auto auto 12px 12px;
