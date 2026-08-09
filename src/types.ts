@@ -27,6 +27,28 @@ export interface TaskDefinition {
   levels: [string, string, string, string]
 }
 
+export type ItemDifficulty = '等价基础'
+
+export interface ItemVariant {
+  id: string
+  taskId: string
+  prompt: string
+  difficulty: ItemDifficulty
+  materials?: string[]
+  tags: string[]
+}
+
+export interface SelectedItemSnapshot extends ItemVariant {
+  bankVersion: string
+}
+
+export interface ItemSelectionAudit {
+  bankVersion: string
+  selectedForDate: string
+  selectionSeed: string
+  items: Record<string, SelectedItemSnapshot>
+}
+
 export interface SpeechEvidence {
   rawText: string
   correctedText: string
@@ -45,7 +67,7 @@ export interface ConsentState {
 
 export interface AiTaskEvidence {
   taskId: string
-  source: 'MediaPipe姿态' | '大字图卡'
+  source: 'MediaPipe姿态' | '大字图卡' | '大模型语义复核'
   suggestedScore: TaskScore
   confidence: number
   quality: number | null
@@ -63,6 +85,7 @@ export interface AssessmentDraft {
   speechEvidence: SpeechEvidence
   poseQuality: number | null
   aiEvidence?: AiTaskEvidence[]
+  itemSelection?: ItemSelectionAudit
   fieldCheckDone: boolean
   crisisFlag: boolean
   crisisNote: string

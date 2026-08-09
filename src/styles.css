@@ -1416,6 +1416,27 @@ h3 {
   font-size: 21px;
 }
 
+.item-selection-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-top: 7px;
+  color: #48645b;
+  font-size: 10px;
+}
+
+.item-selection-meta strong {
+  color: var(--jade);
+  font-size: 11px;
+}
+
+.item-selection-meta small {
+  margin-left: auto;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
 .prompt-text {
   min-height: 55px;
   margin-top: 8px;
@@ -1426,6 +1447,13 @@ h3 {
 
 .prompt-actions {
   margin-top: 12px;
+}
+
+.semantic-message {
+  margin-top: 8px;
+  color: #53665f;
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 .ai-suggestion {
@@ -1878,7 +1906,7 @@ h3 {
 
 .review-grade-band {
   display: grid;
-  grid-template-columns: 1.1fr 1.2fr 0.8fr 1fr;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1px;
   margin-top: 18px;
   background: var(--line);
