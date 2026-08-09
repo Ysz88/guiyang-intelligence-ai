@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { generateDemoState } from '../data/generateDemoData'
+import { upgradeDemoState } from '../data/migrateDemoState'
 import type { AssessmentRecord, DemoState } from '../types'
 
 const STORAGE_KEY = 'guiyang-intelligence-ai-demo-v1'
@@ -7,7 +8,7 @@ const STORAGE_KEY = 'guiyang-intelligence-ai-demo-v1'
 function loadInitialState(): DemoState {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (stored) return JSON.parse(stored) as DemoState
+    if (stored) return upgradeDemoState(JSON.parse(stored) as DemoState)
   } catch {
     // Local storage may be unavailable in a restricted browser context.
   }
