@@ -84,6 +84,29 @@ type SemanticReviewStatus = 'idle' | 'analyzing'
 
 const SEMANTIC_REVIEW_TASK_IDS = new Set(['YY-02', 'YY-03', 'XL-04'])
 
+const MOBILITY_ACTION_GUIDANCE: Record<string, { setup: string; safety: string }> = {
+  'ZT-01': {
+    setup: '坐在稳固椅子上，双脚落地，背部自然伸直。',
+    safety: '保持臀部接触椅面；感到不适请立即停止。',
+  },
+  'ZT-02': {
+    setup: '椅子靠墙或固定，站在镜头前保证全身入框。',
+    safety: '可扶椅子扶手；旁边应有工作人员监护，不要求走动。',
+  },
+  'ZT-03': {
+    setup: '坐稳后双脚向前，交替抬膝，保持臀部不离开椅面。',
+    safety: '动作慢、幅度以舒适为准；不需要站立或借助其他物品。',
+  },
+  'ZT-04': {
+    setup: '坐稳并让肩膀、双手完整入框，左右手分别抬举。',
+    safety: '不追求高度；疼痛或头晕时停止并改用人工记录。',
+  },
+  'ZT-05': {
+    setup: '坐稳，把双手放在胸前可见位置，依次完成拇指对指。',
+    safety: '只用自身双手，不需要桌面物品；小动作必须人工复核。',
+  },
+}
+
 function scoreForVisionCount(count: number): 0 | 1 | 2 | 3 {
   if (count >= 4) return 0
   if (count === 3) return 1
@@ -185,6 +208,9 @@ export function AssessmentView({
   const evaluation = useMemo(() => evaluateAssessment(draft), [draft])
   const activeTasks = TASK_DEFINITIONS[activeDimension]
   const activeTask = activeTasks[activeTaskIndex]
+  const mobilityGuidance = activeDimension === 'mobility'
+    ? MOBILITY_ACTION_GUIDANCE[activeTask.id]
+    : null
   const selectedItem = selectedItemFor(draft.itemSelection, activeTask.id)
   const activePrompt = selectedItem?.prompt ?? activeTask.prompt
   const visionCards = selectedItem?.materials?.length === 4
@@ -773,6 +799,13 @@ export function AssessmentView({
                 <div className="video-stage">
                   <video ref={videoRef} muted playsInline />
                   <canvas ref={poseCanvasRef} className="pose-overlay" aria-hidden="true" />
+                  {mobilityGuidance ? (
+                    <div className="pose-safety-note" role="note">
+                      <strong>单椅安全动作</strong>
+                      <span>{mobilityGuidance.setup}</span>
+                      <small>{mobilityGuidance.safety}</small>
+                    </div>
+                  ) : null}
                   {cameraStream ? (
                     <div
                       className={`pose-framing-guide ${activeTaskIndex === 1 || activeTaskIndex === 2 ? 'full-body' : 'upper-body'} ${poseGuidance?.level ?? ''}`}
@@ -782,8 +815,8 @@ export function AssessmentView({
                   {!cameraStream ? (
                     <div className="video-placeholder">
                       <CameraOff size={30} aria-hidden="true" />
-                      <strong>{canUseCamera ? '开启摄像头后由AI观察动作' : '当前使用无视频方式'}</strong>
-                      <span>模型在本机运行，不录制、不上传、不保存原始视频</span>
+                      <strong>{canUseCamera ? `开启摄像头后观察：${activeTask.label}` : '当前使用无视频方式'}</strong>
+                      <span>只需老人本人和一把稳固椅子；模型在本机运行，不录制、不上传原始视频</span>
                     </div>
                   ) : null}
                   {poseStatus !== 'idle' ? (
