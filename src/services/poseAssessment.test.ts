@@ -14,6 +14,8 @@ function frame(overrides: Partial<PoseFrame> = {}): PoseFrame {
     shoulderX: 0.5,
     hipX: 0.5,
     hipY: 0.62,
+    leftKneeY: 0.78,
+    rightKneeY: 0.78,
     shoulderWidth: 0.24,
     torsoTilt: 0.04,
     wristX: 0.5,
@@ -52,6 +54,18 @@ describe('pose observation scoring', () => {
 
     expect(result.score).toBe(0)
     expect(result.summary).toContain('左右手腕')
+  })
+
+  it('recognizes alternating seated knee lifts without walking', () => {
+    const frames = Array.from({ length: 30 }, (_, index) => frame({
+      leftKneeY: index % 8 < 4 ? 0.62 : 0.8,
+      rightKneeY: index % 8 >= 4 ? 0.62 : 0.8,
+    }))
+
+    const result = scorePoseFramesForTest(2, frames)
+
+    expect(result.score).toBe(0)
+    expect(result.summary).toContain('坐姿')
   })
 
   it('refuses to auto-select when pose quality is too low', () => {
