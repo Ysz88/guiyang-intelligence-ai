@@ -121,6 +121,7 @@ export function ReviewView({
                 <div className="review-grade-band">
                   <div><span>规则总体建议</span><GradeBadge grade={selected.evaluation.overallGrade} /></div>
                   <div><span>规则版本</span><strong>{selected.evaluation.ruleVersion}</strong></div>
+                  <div><span>题库版本</span><strong>{selected.draft.itemSelection?.bankVersion ?? '旧记录未留痕'}</strong></div>
                   <div><span>检查人员</span><strong>{selected.draft.inspectorId}</strong></div>
                   <div><span>输入方式</span><strong>{selected.draft.inputMode}</strong></div>
                 </div>
@@ -179,6 +180,12 @@ export function ReviewView({
                     <div><dt>姿态质量</dt><dd>{selected.draft.poseQuality ?? '人工观察/未采集'}</dd></div>
                     <div><dt>字段全量确认</dt><dd>{selected.draft.fieldCheckDone ? '是' : '否'}</dd></div>
                     <div><dt>原始音视频</dt><dd>未保存</dd></div>
+                    {Object.values(selected.draft.itemSelection?.items ?? {}).map((item) => (
+                      <div key={item.taskId}>
+                        <dt>{item.taskId} · 抽题</dt>
+                        <dd>{item.id} · {item.prompt}</dd>
+                      </div>
+                    ))}
                     {(selected.draft.aiEvidence ?? []).map((evidence) => (
                       <div key={evidence.taskId}>
                         <dt>{evidence.taskId} · {evidence.source}</dt>

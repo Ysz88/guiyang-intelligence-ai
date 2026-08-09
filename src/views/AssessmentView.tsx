@@ -14,6 +14,7 @@ import {
   RotateCcw,
   Save,
   ScanLine,
+  Shuffle,
   Sparkles,
   Speech,
   Square,
@@ -27,6 +28,7 @@ import {
   PageHeader,
 } from '../components/common'
 import { createBlankDraft } from '../data/generateDemoData'
+import { selectedItemFor } from '../data/itemBank'
 import {
   DIMENSION_META,
   DIMENSION_ORDER,
@@ -40,6 +42,10 @@ import {
   stopCamera,
   stopSpeaking,
 } from '../services/browserAi'
+import {
+  requestSemanticReview,
+  semanticReviewConfigured,
+} from '../services/semanticReview'
 import {
   loadPoseLandmarker,
   observeMobilityTask,
@@ -70,10 +76,13 @@ const INPUT_MODES: Array<{
   { value: '历史结果导入', label: '历史结果导入', note: '导入后仍需逐项确认', icon: FileInput },
 ]
 
-const VISION_CARDS = ['山', '水', '人', '家'] as const
+const FALLBACK_VISION_CARDS = ['山', '水', '人', '家']
 
 type PoseAnalysisStatus = 'idle' | 'loading' | 'analyzing'
 type VisionCardPhase = 'ready' | 'showing' | 'answer'
+type SemanticReviewStatus = 'idle' | 'analyzing'
+
+const SEMANTIC_REVIEW_TASK_IDS = new Set(['YY-02', 'YY-03', 'XL-04'])
 
 function scoreForVisionCount(count: number): 0 | 1 | 2 | 3 {
   if (count >= 4) return 0
@@ -127,6 +136,8 @@ export function AssessmentView({
   const [visionCardIndex, setVisionCardIndex] = useState(0)
   const [visionRecognizedCount, setVisionRecognizedCount] = useState<number | null>(null)
   const [listening, setListening] = useState(false)
+  const [semanticStatus, setSemanticStatus] = useState<SemanticReviewStatus>('idle')
+  const [semanticMessage, setSemanticMessage] = useState('')
   const [saved, setSaved] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const poseCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -154,6 +165,8 @@ export function AssessmentView({
     setPoseGuidance(null)
     setVisionPhase('ready')
     setVisionRecognizedCount(null)
+    setSemanticStatus('idle')
+    setSemanticMessage('')
   // cameraStream is intentionally excluded: changing residents is the reset boundary.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedResident?.id])
@@ -172,10 +185,22 @@ export function AssessmentView({
   const evaluation = useMemo(() => evaluateAssessment(draft), [draft])
   const activeTasks = TASK_DEFINITIONS[activeDimension]
   const activeTask = activeTasks[activeTaskIndex]
+  const selectedItem = selectedItemFor(draft.itemSelection, activeTask.id)
+  const activePrompt = selectedItem?.prompt ?? activeTask.prompt
+  const visionCards = selectedItem?.materials?.length === 4
+    ? selectedItem.materials
+    : FALLBACK_VISION_CARDS
   const currentEvidence = (draft.aiEvidence ?? []).find(
     (item) => item.taskId === activeTask.id,
   )
   const isVisionCardTask = activeTask.id === 'ST-01'
+  const semanticText = (
+    draft.speechEvidence.correctedText || draft.speechEvidence.rawText
+  ).trim()
+  const canUseSemanticReview = semanticReviewConfigured()
+    && SEMANTIC_REVIEW_TASK_IDS.has(activeTask.id)
+    && semanticText.length > 0
+    && draft.consent.accepted
 
   useEffect(() => {
     poseAbortRef.current?.abort()
@@ -186,6 +211,8 @@ export function AssessmentView({
     setVisionPhase('ready')
     setVisionCardIndex(0)
     setVisionRecognizedCount(null)
+    setSemanticStatus('idle')
+    setSemanticMessage('')
     const canvas = poseCanvasRef.current
     canvas?.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height)
   }, [activeTask.id])
@@ -399,14 +426,74 @@ export function AssessmentView({
 
   const confirmCurrentEvidence = () => {
     setSaved(false)
-    setDraft((current) => ({
-      ...current,
-      aiEvidence: (current.aiEvidence ?? []).map((item) =>
-        item.taskId === activeTask.id && item.suggestedScore !== null
-          ? { ...item, reviewStatus: '已确认' }
-          : item,
-      ),
-    }))
+    setDraft((current) => {
+      const evidence = (current.aiEvidence ?? []).find(
+        (item) => item.taskId === activeTask.id,
+      )
+      const suggestedScore = evidence?.suggestedScore
+      return {
+        ...current,
+        tasks: suggestedScore === null || suggestedScore === undefined
+          ? current.tasks
+          : {
+              ...current.tasks,
+              [activeDimension]: current.tasks[activeDimension].map((score, index) =>
+                index === activeTaskIndex ? suggestedScore : score,
+              ),
+            },
+        aiEvidence: (current.aiEvidence ?? []).map((item) =>
+          item.taskId === activeTask.id && item.suggestedScore !== null
+            ? { ...item, reviewStatus: '已确认' }
+            : item,
+        ),
+      }
+    })
+  }
+
+  const startSemanticReview = async () => {
+    if (!canUseSemanticReview || semanticStatus === 'analyzing') return
+    setSemanticStatus('analyzing')
+    setSemanticMessage('正在生成结构化语义草稿…')
+    try {
+      const result = await requestSemanticReview({
+        taskId: activeTask.id,
+        itemId: selectedItem?.id ?? null,
+        prompt: activePrompt,
+        responseText: semanticText,
+        levels: activeTask.levels,
+        languageBackground: draft.speechEvidence.languageBackground,
+      })
+      const requiresHumanReview = result.safetyFlags.length > 0
+      const suggestedScore = requiresHumanReview ? null : result.suggestedScore
+      setSaved(false)
+      setDraft((current) => ({
+        ...current,
+        aiEvidence: upsertEvidence(current.aiEvidence, {
+          taskId: activeTask.id,
+          source: '大模型语义复核',
+          suggestedScore,
+          confidence: result.confidence,
+          quality: null,
+          summary: result.followUp
+            ? `${result.evidence} 建议追问：${result.followUp}`
+            : result.evidence,
+          metrics: [
+            `模型 ${result.modelId}`,
+            selectedItem ? `题目 ${selectedItem.id}` : '固定任务',
+            ...result.safetyFlags.map((flag) => `安全标记 ${flag}`),
+          ],
+          reviewStatus: suggestedScore === null ? '转人工' : '待确认',
+          capturedAt: new Date().toISOString(),
+        }),
+      }))
+      setSemanticMessage(suggestedScore === null
+        ? '语义证据不足或存在安全标记，已转人工'
+        : '语义草稿已生成，需检查人员确认')
+    } catch (error) {
+      setSemanticMessage(error instanceof Error ? error.message : '语义复核不可用')
+    } finally {
+      setSemanticStatus('idle')
+    }
   }
 
   const applyVisionCardResult = (
@@ -434,7 +521,12 @@ export function AssessmentView({
         summary: method === 'speech'
           ? `语音回答匹配到${normalizedCount}个目标字，已按固定规则预选${score}档。`
           : `检查人员确认辨认${normalizedCount}个字，已按固定规则换算为${score}档。`,
-        metrics: [`目标字 4个`, `辨认 ${normalizedCount}个`, method === 'speech' ? '来源 语音匹配' : '来源 现场确认'],
+        metrics: [
+          selectedItem ? `题目 ${selectedItem.id}` : '默认图卡',
+          '目标字 4个',
+          `辨认 ${normalizedCount}个`,
+          method === 'speech' ? '来源 语音匹配' : '来源 现场确认',
+        ],
         reviewStatus: method === 'touch' ? '已确认' : '待确认',
         capturedAt: new Date().toISOString(),
       }),
@@ -446,7 +538,7 @@ export function AssessmentView({
     visionRunRef.current = runId
     setVisionRecognizedCount(null)
     setVisionPhase('showing')
-    for (let index = 0; index < VISION_CARDS.length; index += 1) {
+    for (let index = 0; index < visionCards.length; index += 1) {
       if (visionRunRef.current !== runId) return
       setVisionCardIndex(index)
       await new Promise<void>((resolve) => window.setTimeout(resolve, 1300))
@@ -465,7 +557,7 @@ export function AssessmentView({
     const recognizer = createSpeechRecognizer(
       (text, confidence) => {
         if (isVisionCardTask && visionPhase === 'answer') {
-          const count = VISION_CARDS.filter((character) => text.includes(character)).length
+          const count = visionCards.filter((character) => text.includes(character)).length
           applyVisionCardResult(count, 'speech', confidence)
         }
         setDraft((current) => ({
@@ -746,8 +838,8 @@ export function AssessmentView({
                       </>
                     ) : visionPhase === 'showing' ? (
                       <>
-                        <strong className="vision-character">{VISION_CARDS[visionCardIndex]}</strong>
-                        <span>第 {visionCardIndex + 1} / {VISION_CARDS.length} 张</span>
+                        <strong className="vision-character">{visionCards[visionCardIndex]}</strong>
+                        <span>第 {visionCardIndex + 1} / {visionCards.length} 张</span>
                       </>
                     ) : (
                       <>
@@ -763,7 +855,7 @@ export function AssessmentView({
                       </button>
                     ) : visionPhase === 'showing' ? (
                       <div className="vision-card-dots" aria-label="图卡显示进度">
-                        {VISION_CARDS.map((card, index) => (
+                        {visionCards.map((card, index) => (
                           <i key={card} className={index <= visionCardIndex ? 'active' : ''} />
                         ))}
                       </div>
@@ -806,9 +898,17 @@ export function AssessmentView({
                   <strong>{activeTaskIndex + 1}/{activeTasks.length}</strong>
                 </div>
                 <h2>{activeTask.label}</h2>
-                <p className="prompt-text">{activeTask.prompt}</p>
+                {selectedItem ? (
+                  <div className="item-selection-meta" aria-label="本次抽取题目">
+                    <Shuffle size={15} aria-hidden="true" />
+                    <span>本次抽题</span>
+                    <strong>{selectedItem.id}</strong>
+                    <small>{draft.itemSelection?.bankVersion}</small>
+                  </div>
+                ) : null}
+                <p className="prompt-text">{activePrompt}</p>
                 <div className="prompt-actions">
-                  <button className="secondary-button" type="button" onClick={() => speakPrompt(activeTask.prompt)}>
+                  <button className="secondary-button" type="button" onClick={() => speakPrompt(activePrompt)}>
                     <Volume2 size={17} aria-hidden="true" />播报问题
                   </button>
                   <button
@@ -820,7 +920,21 @@ export function AssessmentView({
                     {listening ? <MicOff size={17} aria-hidden="true" /> : <Mic size={17} aria-hidden="true" />}
                     {listening ? '停止识别' : '语音作答'}
                   </button>
+                  {semanticReviewConfigured() && SEMANTIC_REVIEW_TASK_IDS.has(activeTask.id) ? (
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={startSemanticReview}
+                      disabled={!canUseSemanticReview || semanticStatus === 'analyzing'}
+                    >
+                      {semanticStatus === 'analyzing'
+                        ? <LoaderCircle className="spin" size={17} aria-hidden="true" />
+                        : <Sparkles size={17} aria-hidden="true" />}
+                      语义复核
+                    </button>
+                  ) : null}
                 </div>
+                {semanticMessage ? <p className="semantic-message" role="status">{semanticMessage}</p> : null}
                 {currentEvidence ? (
                   <div className={`ai-suggestion ${currentEvidence.reviewStatus === '转人工' ? 'manual' : ''}`}>
                     <Sparkles size={18} aria-hidden="true" />
