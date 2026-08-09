@@ -1,4 +1,6 @@
 import { DIMENSION_META, DIMENSION_ORDER, TASK_DEFINITIONS } from './taskDefinitions'
+import { createItemSelection } from './itemBank'
+import { DEMO_STATE_VERSION } from './migrateDemoState'
 import { evaluateAssessment } from '../rules/engine'
 import type {
   AssessmentDraft,
@@ -62,6 +64,7 @@ function chooseSeverity(random: () => number): Grade {
 export function createBlankDraft(
   residentId: string,
   languageBackground: LanguageBackground = '未知或不愿填写',
+  selectionDate = new Date().toISOString().slice(0, 10),
 ): AssessmentDraft {
   return {
     residentId,
@@ -89,6 +92,7 @@ export function createBlankDraft(
     },
     poseQuality: null,
     aiEvidence: [],
+    itemSelection: createItemSelection(residentId, selectionDate),
     fieldCheckDone: false,
     crisisFlag: false,
     crisisNote: '',
@@ -126,7 +130,8 @@ export function generateDemoState(): DemoState {
     const languageBackground = LANGUAGE_BACKGROUNDS[index % LANGUAGE_BACKGROUNDS.length]
     const hasRecord = index < 54
     const baseSeverity = chooseSeverity(random)
-    const draft = createBlankDraft(residentId, languageBackground)
+    const checkDate = dateForIndex(index)
+    const draft = createBlankDraft(residentId, languageBackground, checkDate)
 
     draft.consent.accepted = true
     draft.consent.person = index % 8 === 0 ? '代理人' : '本人'
@@ -184,7 +189,7 @@ export function generateDemoState(): DemoState {
       floor: `${(index % 3) + 2}层`,
       languageBackground,
       checkStatus: status,
-      lastCheckDate: hasRecord ? dateForIndex(index) : null,
+      lastCheckDate: hasRecord ? checkDate : null,
       lastGrade: evaluation.overallGrade,
       previousGrade,
       mainNeed: highestNeed(draft),
@@ -195,12 +200,12 @@ export function generateDemoState(): DemoState {
       records.push({
         id: `SIM-REC-${residentNumber}`,
         residentId,
-        checkDate: dateForIndex(index),
+        checkDate,
         checkType: '年度检查',
         draft,
         evaluation,
         status,
-        confirmedAt: status === '已确认' ? `${dateForIndex(index)}T15:30:00+08:00` : null,
+        confirmedAt: status === '已确认' ? `${checkDate}T15:30:00+08:00` : null,
         confirmedBy: status === '已确认' ? 'INS-DEMO-01' : null,
         adjustmentReason: '',
         simulated: true,
@@ -208,5 +213,5 @@ export function generateDemoState(): DemoState {
     }
   }
 
-  return { residents, records, version: 1 }
+  return { residents, records, version: DEMO_STATE_VERSION }
 }
